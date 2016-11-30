@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package logtail;
+
+service LogTail {
+    rpc GetFiles(RequestFile) returns (Files) {}
+}
+
+message RequestFile {}
+
+message Files {
+    repeated string name = 1;
+}
