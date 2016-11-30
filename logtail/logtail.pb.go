@@ -11,6 +11,8 @@ It is generated from these files:
 It has these top-level messages:
 	RequestFile
 	Files
+	FileName
+	Content
 */
 package logtail
 
@@ -60,9 +62,45 @@ func (m *Files) GetName() []string {
 	return nil
 }
 
+type FileName struct {
+	Name             *string `protobuf:"bytes,1,req,name=name" json:"name,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *FileName) Reset()                    { *m = FileName{} }
+func (m *FileName) String() string            { return proto.CompactTextString(m) }
+func (*FileName) ProtoMessage()               {}
+func (*FileName) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+func (m *FileName) GetName() string {
+	if m != nil && m.Name != nil {
+		return *m.Name
+	}
+	return ""
+}
+
+type Content struct {
+	Line             []string `protobuf:"bytes,1,rep,name=line" json:"line,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
+}
+
+func (m *Content) Reset()                    { *m = Content{} }
+func (m *Content) String() string            { return proto.CompactTextString(m) }
+func (*Content) ProtoMessage()               {}
+func (*Content) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *Content) GetLine() []string {
+	if m != nil {
+		return m.Line
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*RequestFile)(nil), "logtail.RequestFile")
 	proto.RegisterType((*Files)(nil), "logtail.Files")
+	proto.RegisterType((*FileName)(nil), "logtail.FileName")
+	proto.RegisterType((*Content)(nil), "logtail.Content")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -77,6 +115,7 @@ const _ = grpc.SupportPackageIsVersion4
 
 type LogTailClient interface {
 	GetFiles(ctx context.Context, in *RequestFile, opts ...grpc.CallOption) (*Files, error)
+	GetFileContent(ctx context.Context, in *FileName, opts ...grpc.CallOption) (*Content, error)
 }
 
 type logTailClient struct {
@@ -96,10 +135,20 @@ func (c *logTailClient) GetFiles(ctx context.Context, in *RequestFile, opts ...g
 	return out, nil
 }
 
+func (c *logTailClient) GetFileContent(ctx context.Context, in *FileName, opts ...grpc.CallOption) (*Content, error) {
+	out := new(Content)
+	err := grpc.Invoke(ctx, "/logtail.LogTail/GetFileContent", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for LogTail service
 
 type LogTailServer interface {
 	GetFiles(context.Context, *RequestFile) (*Files, error)
+	GetFileContent(context.Context, *FileName) (*Content, error)
 }
 
 func RegisterLogTailServer(s *grpc.Server, srv LogTailServer) {
@@ -124,6 +173,24 @@ func _LogTail_GetFiles_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LogTail_GetFileContent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileName)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LogTailServer).GetFileContent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/logtail.LogTail/GetFileContent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LogTailServer).GetFileContent(ctx, req.(*FileName))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _LogTail_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "logtail.LogTail",
 	HandlerType: (*LogTailServer)(nil),
@@ -131,6 +198,10 @@ var _LogTail_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFiles",
 			Handler:    _LogTail_GetFiles_Handler,
+		},
+		{
+			MethodName: "GetFileContent",
+			Handler:    _LogTail_GetFileContent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -140,13 +211,16 @@ var _LogTail_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("logtail.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 113 bytes of a gzipped FileDescriptorProto
+	// 167 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0xcd, 0xc9, 0x4f, 0x2f,
 	0x49, 0xcc, 0xcc, 0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x87, 0x72, 0x95, 0x78, 0xb9,
 	0xb8, 0x83, 0x52, 0x0b, 0x4b, 0x53, 0x8b, 0x4b, 0xdc, 0x32, 0x73, 0x52, 0x95, 0x44, 0xb9, 0x58,
 	0x41, 0x74, 0xb1, 0x10, 0x0f, 0x17, 0x4b, 0x5e, 0x62, 0x6e, 0xaa, 0x04, 0xa3, 0x02, 0xb3, 0x06,
-	0xa7, 0x91, 0x2d, 0x17, 0xbb, 0x4f, 0x7e, 0x7a, 0x48, 0x62, 0x66, 0x8e, 0x90, 0x11, 0x17, 0x87,
-	0x7b, 0x6a, 0x09, 0x44, 0x91, 0x88, 0x1e, 0xcc, 0x54, 0x24, 0x33, 0xa4, 0xf8, 0xe0, 0xa2, 0x60,
-	0x55, 0x4a, 0x0c, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0xd3, 0xfa, 0xf6, 0x08, 0x7d, 0x00, 0x00,
-	0x00,
+	0xa7, 0x92, 0x04, 0x17, 0x07, 0x48, 0xd8, 0x2f, 0x31, 0x37, 0x15, 0x49, 0x86, 0x49, 0x83, 0x53,
+	0x49, 0x9c, 0x8b, 0xdd, 0x39, 0x3f, 0xaf, 0x24, 0x35, 0xaf, 0x04, 0x24, 0x91, 0x93, 0x99, 0x07,
+	0xd5, 0x62, 0x54, 0xc6, 0xc5, 0xee, 0x93, 0x9f, 0x1e, 0x92, 0x98, 0x99, 0x23, 0x64, 0xc4, 0xc5,
+	0xe1, 0x9e, 0x5a, 0x02, 0x31, 0x57, 0x44, 0x0f, 0xe6, 0x10, 0x24, 0x6b, 0xa5, 0xf8, 0xe0, 0xa2,
+	0x60, 0x55, 0x4a, 0x0c, 0x42, 0xe6, 0x5c, 0x7c, 0x50, 0x3d, 0x30, 0xe3, 0x05, 0x51, 0xd4, 0x80,
+	0x9c, 0x22, 0x25, 0x00, 0x17, 0x82, 0x2a, 0x52, 0x62, 0x00, 0x04, 0x00, 0x00, 0xff, 0xff, 0xfb,
+	0xcd, 0xcb, 0x00, 0xe9, 0x00, 0x00, 0x00,
 }

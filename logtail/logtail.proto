@@ -4,6 +4,7 @@ package logtail;
 
 service LogTail {
     rpc GetFiles(RequestFile) returns (Files) {}
+    rpc GetFileContent(FileName) returns (Content) {}
 }
 
 message RequestFile {}
@@ -11,3 +12,12 @@ message RequestFile {}
 message Files {
     repeated string name = 1;
 }
+
+message FileName {
+    required string name = 1;
+}
+
+message Content {
+    repeated string line = 1;
+}
+

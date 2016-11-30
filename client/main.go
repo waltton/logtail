@@ -27,4 +27,12 @@ func main() {
 	}
 
 	log.Print(r.GetName())
+
+	// Contact the server and print out its response.
+	r2, err := c.GetFileContent(context.Background(), &pb.FileName{Name: &r.GetName()[0]})
+	if err != nil {
+		log.Fatalf("could not greet: %v", err)
+	}
+
+	log.Print(r2.GetLine())
 }
