@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"os"
 
 	yaml "gopkg.in/yaml.v2"
 
@@ -25,6 +26,7 @@ teste2: /home/waltton/dev/go/src/github.com/waltton/logtail/server/main.go
 `
 
 const port = ":50051"
+const maxSize = 1024
 
 func getFiles() (map[string]string, error) {
 	files := map[string]string{}
@@ -78,12 +80,38 @@ func (s *server) GetFileContent(ctx context.Context, in *pb.FileName) (*pb.Conte
 		return nil, fmt.Errorf("could get the file path: %s", err)
 	}
 
-	dat, err := ioutil.ReadFile(path)
+	fileStat, err := os.Stat(path)
 	if err != nil {
-		return nil, fmt.Errorf("could read the file: %s", err)
+		return nil, fmt.Errorf("could read the file size: %s", err)
 	}
 
-	lines := strings.Split(string(dat), "\n")
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("could open the file: %s", err)
+	}
+
+	var lines []string
+	if fileStat.Size() > maxSize {
+		_, err = file.Seek(maxSize, 0)
+		if err != nil {
+			return nil, fmt.Errorf("could seek in the file: %s", err)
+		}
+
+		buf := make([]byte, maxSize)
+		_, err = file.Read(buf)
+		if err != nil {
+			return nil, fmt.Errorf("could read the file: %s", err)
+		}
+
+		lines = strings.Split("path: "+path+"\n\n"+string(buf), "\n")
+	} else {
+		dat, err := ioutil.ReadAll(file)
+		if err != nil {
+			return nil, fmt.Errorf("could read the file: %s", err)
+		}
+		lines = strings.Split("path: "+path+"\n\n"+string(dat), "\n")
+	}
+
 	return &pb.Content{Line: lines}, nil
 }
 
