@@ -1,6 +1,9 @@
 # logtail
 
-## bot commands
+## Build and deploy instructions
+- **TODO**
+
+## Bot commands
 - `!logtail list`
     - List of servers
 - `!logtail <server_name> list`
