@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	const slackToken string = "xoxb-110355919763-q0Tk4US3UgCkKs1Pm4WXMt4m"
+	const slackToken string = ""
 
 	slack.Run(slackToken)
 }
